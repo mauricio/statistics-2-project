@@ -1,12 +1,5 @@
----
-title: Is there a relationship between education level and willingness to diminish
-  the government deficit by cutting military costs?
-output:
-  html_document:
-    keep_md: yes
-    theme: cerulean
-date: "2014/10/19"
----
+# Is there a relationship between education level and willingness to diminish the government deficit by cutting military costs?
+2014/10/19  
 
 ### Introduction:
 
@@ -36,9 +29,20 @@ Given this is an observational study, it's only possible to assume association b
 
 We starting exploring the dataset by loading the data:
 
-```{r loading_data, cache=TRUE}
+
+```r
 load(url("http://bit.ly/dasi_anes_data"))
 summary(anes$budget_rdefmil)
+```
+
+```
+##                    Favor                   Oppose Neither Favor Nor Oppose 
+##                     1986                     2447                     1027 
+##                     NA's 
+##                      454
+```
+
+```r
 specific <- anes[,c("dem_edugroup", "budget_rdefmil")]
 specific <- specific[complete.cases(specific),]
 ```
@@ -47,34 +51,64 @@ Once we load the data, we create a separate dataset with only the variables we'r
 
 Let's look at the summary of the education group variable:
 
-```{r education_group, cache=TRUE}
+
+```r
 summary(anes$dem_edugroup)
+```
+
+```
+##            Less Than High School Credential 
+##                                         622 
+##                      High School Credential 
+##                                        1442 
+## Some Post-High-School, No Bachelor'S Degree 
+##                                        1972 
+##                           Bachelor'S Degree 
+##                                        1120 
+##                             Graduate Degree 
+##                                         708 
+##                                        NA's 
+##                                          50
 ```
 
 Most of the respondents have finished at least high school, only 622 (11%) did not complete it.
 
 Now let's look at the budget costs summary:
 
-```{r budget_cut, cache=TRUE}
+
+```r
 summary(anes$budget_rdefmil)
+```
+
+```
+##                    Favor                   Oppose Neither Favor Nor Oppose 
+##                     1986                     2447                     1027 
+##                     NA's 
+##                      454
 ```
 
 Here we have _36%_ of the population in favor of cutting military costs and _44%_ opposing it with _20%_ having no specific opinion on it.
 
 Now let's look at how the data presents itself, starting with a barplot:
 
-```{r barplot, cache=TRUE}
+
+```r
 counts <- table(specific$budget_rdefmil, specific$dem_edugroup)
 barplot(counts, main="Military costs by education level",
          xlab="Education Level", col=c("green", "red", "blue"),
          legend = rownames(counts))
 ```
 
+![plot of chunk barplot](./analysis_files/figure-html/barplot.png) 
+
 Looking at this plot we can see that it seems like the proportion of people in favor grows as the education level grows up. To verify proportion in categorical variables, we're better off doing a mosaic plot, let's build one now:
 
-```{r mosaicplot, cache=TRUE}
+
+```r
 mosaicplot(formula=specific$dem_edugroup ~ specific$budget_rdefmil, color=c("green", "red", "blue"), xlab="Education Level", ylab="Military budget cut", main="Education level by military budget cut")
 ```
+
+![plot of chunk mosaicplot](./analysis_files/figure-html/mosaicplot.png) 
 
 With the mosaicplot the proportions are much more visible and it seems like there is a trend there, as the education level grows, the amount of people in favor of cutting military costs grows as well.
 
@@ -94,8 +128,17 @@ The conditions for a chi-square independence test are as follows:
 
 Let's do the computation:
 
-```{r chi-square, cache=TRUE}
+
+```r
 chisq.test(specific$dem_edugroup, specific$budget_rdefmil)
+```
+
+```
+## 
+## 	Pearson's Chi-squared test
+## 
+## data:  specific$dem_edugroup and specific$budget_rdefmil
+## X-squared = 182.7, df = 8, p-value < 2.2e-16
 ```
 
 With this result, given our _pvalue_ is much smaller than the 5% significance level we decided to use, we reject H<sub>0</sub> and accept the alternative hypothesis, there is a relationship between education level and military budget cut.
